@@ -1,0 +1,51 @@
+# Environment Variables
+.env
+.env.local
+.env.production
+
+# Database
+*.sqlite3
+db.sqlite3
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Django
+/media
+# /staticfiles
+/staticfiles
+# (keep app-level `static/` tracked so CSS isn't accidentally ignored)
+#/static
+*.log
+local_settings.py
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Node
+node_modules/
+npm-debug.log*
+
+# Deployment
+.deployment
+.azure/
+
+# Secrets
+secrets.json
+credentials.json
