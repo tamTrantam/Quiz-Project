@@ -6,7 +6,7 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 
 class LoginForm(AuthenticationForm):
-    username_or_emial = forms.CharField(widget=forms.TextInput(attrs={
+    username = forms.CharField(widget=forms.TextInput(attrs={
         'class': 'form-control', 'placeholder': 'Username or Email'
     }))
     password = forms.CharField(widget=forms.PasswordInput(attrs={
