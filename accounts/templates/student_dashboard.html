@@ -1,0 +1,11 @@
+{% extends 'accounts/dashboard_shell.html' %}
+
+{% block title %}Student Dashboard{% endblock %}
+
+{% block dashboard_viewport %}
+<div class="viewport-card">
+    <h2>Welcome to the Student Dashboard, {{ user.username }}!</h2>
+    <p>Your assignments, quiz attempts, and course documents will appear in this viewport.</p>
+
+</div>
+{% endblock %}

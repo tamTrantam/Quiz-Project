@@ -6,6 +6,7 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 
 class LoginForm(AuthenticationForm):
+    """Custom login form extending Django's AuthenticationForm to include Bootstrap styling (which enhances the user interface)."""
     username = forms.CharField(widget=forms.TextInput(attrs={
         'class': 'form-control', 'placeholder': 'Username or Email'
     }))

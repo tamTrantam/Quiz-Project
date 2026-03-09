@@ -1,0 +1,293 @@
+/* ========================================================
+Customizable Theme Starter (CSS Variables)
+======================================================== */
+
+:root {
+/* === Color System === */
+--color-primary: #0d6efd;
+--color-secondary: #6c757d;
+--color-accent: #ffc107;
+--color-bg: #ffffff;
+--color-surface: #f8f9fa;
+--color-text: #212529;
+--color-text-light: #f8f9fa;
+
+/* === Typography === */
+--font-family: 'Inter', sans-serif;
+--font-size-base: 16px;
+--font-size-heading: 2rem;
+--font-weight-bold: 700;
+
+/* === Spacing & Layout === */
+--spacing-xs: 4px;
+--spacing-sm: 8px;
+--spacing-md: 16px;
+--spacing-lg: 32px;
+--radius: 8px;
+
+/* === Effects & Transitions === */
+--shadow-soft: 0 2px 5px rgba(0, 0, 0, 0.1);
+--shadow-strong: 0 4px 15px rgba(0, 0, 0, 0.25);
+--transition-speed: 0.2s;
+
+/* === Bootstrap Integration === */
+--bs-primary: var(--color-primary);
+--bs-body-bg: var(--color-bg);
+--bs-body-color: var(--color-text);
+}
+
+/* ========================================================
+Theme Modes (Light / Dark)
+======================================================== */
+
+:root[data-theme="light"] {
+--color-bg: #ffffff;
+--color-text: #212529;
+--color-surface: #f8f9fa;
+}
+
+:root[data-theme="dark"] {
+--color-bg: #121212;
+--color-text: #f8f9fa;
+--color-surface: #1e1e1e;
+}
+/* ========================================================
+Custom Component Styles
+======================================================== */
+
+.login-card {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+/* ========================================================
+Dashboard Shell Layout
+======================================================== */
+
+.dashboard-layout {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    min-height: 100vh;
+    background: #f3f6fa;
+}
+
+body.has-top-nav .dashboard-layout {
+    min-height: calc(100vh - 56px);
+}
+
+.dashboard-sidebar {
+    display: flex;
+    flex-direction: column;
+    background: #17304a;
+    color: #f5f7fb;
+    padding: 16px;
+    gap: 16px;
+    position: relative;
+    transition: transform 0.25s ease, width 0.25s ease, padding 0.25s ease;
+}
+
+.sidebar-header {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.sidebar-toggle {
+    border: 1px solid #4e6680;
+    background: #27445f;
+    color: #fff;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+}
+
+.hamburger-line {
+    display: block;
+    width: 16px;
+    height: 2px;
+    background: currentColor;
+}
+
+.profile-card {
+    text-align: center;
+}
+
+.profile-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #b4c4d6;
+    background: #dce6f0;
+}
+
+.profile-name {
+    margin-top: 10px;
+    font-weight: 700;
+}
+
+.profile-role {
+    font-size: 0.85rem;
+    color: #c6d4e0;
+}
+
+.sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.sidebar-btn {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid #3b5672;
+    background: #22415e;
+    color: #fff;
+    text-decoration: none;
+}
+
+.sidebar-btn.is-active,
+.sidebar-btn:hover {
+    background: #2d5c84;
+}
+
+.sidebar-btn[disabled] {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.sidebar-more {
+    margin-top: auto;
+    border-top: 1px solid #3b5672;
+    padding-top: 12px;
+}
+
+.sidebar-more summary {
+    list-style: none;
+}
+
+.sidebar-link {
+    display: block;
+    color: #fff;
+    text-decoration: none;
+    padding: 8px 6px;
+}
+
+.sidebar-link.is-active,
+.sidebar-link:hover {
+    color: #a5d0ff;
+}
+
+.dashboard-main {
+    min-width: 0;
+    display: grid;
+    grid-template-rows: auto 1fr;
+}
+
+.dashboard-breadcrumb {
+    background: #ffffff;
+    border-bottom: 1px solid #dde5ef;
+    padding: 14px 18px;
+    font-size: 0.95rem;
+    overflow-x: auto;
+    white-space: nowrap;
+}
+
+.sidebar-top-toggle {
+    border: 1px solid #b7c5d5;
+    background: #fff;
+    border-radius: 6px;
+    width: 34px;
+    height: 34px;
+    margin-right: 10px;
+    color: #2a3f56;
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 3px;
+}
+
+.dashboard-layout.sidebar-collapsed .sidebar-top-toggle {
+    display: inline-flex;
+}
+
+.crumb {
+    font-weight: 600;
+}
+
+.crumb-sep {
+    color: #6f7f91;
+    margin: 0 8px;
+}
+
+.dashboard-viewport {
+    padding: 18px;
+    overflow: auto;
+}
+
+.viewport-card {
+    background: #fff;
+    border: 1px solid #dde5ef;
+    border-radius: 10px;
+    padding: 18px;
+}
+
+.viewport-actions {
+    margin-top: 16px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.dashboard-layout.sidebar-collapsed {
+    grid-template-columns: 0 1fr;
+}
+
+.dashboard-layout.sidebar-collapsed .dashboard-sidebar {
+    width: 0;
+    padding: 0;
+    transform: translateX(-100%);
+    overflow: hidden;
+}
+
+@media (max-width: 900px) {
+    .dashboard-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .dashboard-sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        width: 280px;
+        z-index: 1000;
+    }
+
+    body.has-top-nav .dashboard-sidebar {
+        top: 56px;
+    }
+
+    .dashboard-layout.sidebar-collapsed .dashboard-sidebar {
+        transform: translateX(-100%);
+        width: 280px;
+        padding: 16px;
+    }
+
+    .dashboard-main {
+        width: 100%;
+    }
+
+    .dashboard-layout.sidebar-collapsed .sidebar-top-toggle {
+        display: inline-flex;
+    }
+}

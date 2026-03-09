@@ -4,7 +4,6 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-decouple = "*"
 asgiref = "==3.9.1"
 cloudinary = "==1.41.0"
 dj-database-url = "==3.0.1"
@@ -19,6 +18,8 @@ sqlparse = "==0.5.3"
 tzdata = "==2025.2"
 whitenoise = "==6.10.0"
 python-decouple = "*"
+pyjwt = "*"
+cryptography = "*"
 
 [dev-packages]
 

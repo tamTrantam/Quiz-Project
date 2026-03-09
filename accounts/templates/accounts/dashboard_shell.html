@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="dashboard-layout" id="dashboardLayout">
+    <aside class="dashboard-sidebar" id="dashboardSidebar" aria-label="Dashboard navigation">
+        <div class="sidebar-header">
+            <button class="sidebar-toggle" type="button" id="sidebarToggle" aria-label="Toggle dashboard navigation" aria-expanded="true">
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+            </button>
+        </div>
+
+        <div class="profile-card">
+            <img class="profile-avatar" src="{{ profile_image_url }}" alt="{{ display_name }} profile picture">
+            <div class="profile-name">{{ display_name }}</div>
+            <div class="profile-role">{{ role_label }}</div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a class="sidebar-btn {% if active_section == 'quizzes' %}is-active{% endif %}" href="{% url 'dashboard_quizzes' %}">Quizzes</a>
+            <a class="sidebar-btn {% if active_section == 'documents' %}is-active{% endif %}" href="{% url 'dashboard_documents' %}">Documents</a>
+            <button class="sidebar-btn" type="button" disabled>More features soon</button>
+        </nav>
+
+        <div class="sidebar-more">
+            <details>
+                <summary class="sidebar-btn more-btn">More</summary>
+                <a class="sidebar-link {% if active_section == 'settings' %}is-active{% endif %}" href="{% url 'dashboard_settings' %}">Settings</a>
+                <a class="sidebar-link" href="{% url 'logout' %}">Logout</a>
+            </details>
+        </div>
+    </aside>
+
+    <section class="dashboard-main">
+        <div class="dashboard-breadcrumb" aria-label="breadcrumb">
+            <button class="sidebar-top-toggle" type="button" id="sidebarTopToggle" aria-label="Toggle dashboard navigation" aria-expanded="true">
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+            </button>
+            {% for crumb in breadcrumb_parts %}
+                <span class="crumb">{{ crumb }}</span>{% if not forloop.last %}<span class="crumb-sep">&gt;</span>{% endif %}
+            {% endfor %}
+        </div>
+
+        <main class="dashboard-viewport">
+            {% block dashboard_viewport %}{% endblock %}
+        </main>
+    </section>
+</div>
+
+<script>
+(function () {
+  var toggle = document.getElementById('sidebarToggle');
+    var topToggle = document.getElementById('sidebarTopToggle');
+  var layout = document.getElementById('dashboardLayout');
+    if (!layout) return;
+
+    function handleToggle() {
+    layout.classList.toggle('sidebar-collapsed');
+    var expanded = !layout.classList.contains('sidebar-collapsed');
+        if (toggle) toggle.setAttribute('aria-expanded', String(expanded));
+        if (topToggle) topToggle.setAttribute('aria-expanded', String(expanded));
+    }
+
+    if (toggle) toggle.addEventListener('click', handleToggle);
+    if (topToggle) topToggle.addEventListener('click', handleToggle);
+})();
+</script>
+{% endblock %}

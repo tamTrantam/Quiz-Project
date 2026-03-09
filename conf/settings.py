@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',  # Google OAuth2 provider
 
         
      # Third party apps
@@ -60,6 +61,15 @@ INSTALLED_APPS = [
 # Custom user model configuration (must be set before first migrate)
 AUTH_USER_MODEL = 'accounts.CustomUser'
 
+# Default file storage for media files
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
+# Cloudinary credentials
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': config('CLOUDINARY_CLOUD_NAME'),
+    'API_KEY': config('CLOUDINARY_API_KEY'),
+    'API_SECRET': config('CLOUDINARY_API_SECRET'),
+}
 # Required by django-allauth
 SITE_ID = 1
 
@@ -80,8 +90,8 @@ ROOT_URLCONF = 'conf.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'html'],
-        'APP_DIRS': True,
+        'DIRS': [BASE_DIR /'templates'],  # Global templates directory
+        'APP_DIRS': True, # Enable template loading from app directories
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.request',
@@ -134,7 +144,26 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# Email backend configuration
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # For development, prints emails to the console
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',  # Default backend
+    'allauth.account.auth_backends.AuthenticationBackend',  # For django-allauth
+]
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'SCOPE': [
+            'profile',
+            'email',
+        ],
+        'AUTH_PARAMS': {
+            'access_type': 'online',
+        }
+    }
+}
 
+LOGIN_URL = '/login/'
+LOGIN_REDIRECT_URL = '/'
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
@@ -151,7 +180,8 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [BASE_DIR / 'static']
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
