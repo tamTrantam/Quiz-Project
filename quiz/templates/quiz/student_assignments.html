@@ -1,0 +1,58 @@
+{% extends 'accounts/dashboard_shell.html' %}
+
+{% block title %}Student Assignments{% endblock %}
+
+{% block dashboard_viewport %}
+<div class="viewport-card student-workflow-grid">
+    <h2>Assignments and Quizzes</h2>
+    <p class="workflow-muted">You are currently enrolled in {{ course_count }} active course{{ course_count|pluralize }}.</p>
+
+    <section class="workflow-section">
+        <h3>Upcoming Assignments</h3>
+        {% if upcoming_assignments %}
+            <ul class="workflow-list">
+                {% for assignment in upcoming_assignments %}
+                    <li>
+                        <a href="{% url 'student_assignment_detail' assignment.id %}">{{ assignment.title }}</a>
+                        <span class="workflow-meta">{{ assignment.course.title }} | due {{ assignment.due_at|date:'M d, Y H:i' }}</span>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="workflow-empty">No upcoming assignments.</p>
+        {% endif %}
+    </section>
+
+    <section class="workflow-section">
+        <h3>Open-Ended Assignments</h3>
+        {% if undated_assignments %}
+            <ul class="workflow-list">
+                {% for assignment in undated_assignments %}
+                    <li>
+                        <a href="{% url 'student_assignment_detail' assignment.id %}">{{ assignment.title }}</a>
+                        <span class="workflow-meta">{{ assignment.course.title }} | no due date</span>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="workflow-empty">No open-ended assignments.</p>
+        {% endif %}
+    </section>
+
+    <section class="workflow-section">
+        <h3>Latest Quiz Assignments</h3>
+        {% if recent_quiz_assignments %}
+            <ul class="workflow-list">
+                {% for assignment in recent_quiz_assignments %}
+                    <li>
+                        <a href="{% url 'student_assignment_detail' assignment.id %}">{{ assignment.title }}</a>
+                        <span class="workflow-meta">{{ assignment.course.title }} | quiz: {{ assignment.quiz.title }}</span>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="workflow-empty">No published quiz assignments yet.</p>
+        {% endif %}
+    </section>
+</div>
+{% endblock %}

@@ -3,8 +3,10 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.templatetags.static import static
+from django.utils import timezone
 from .models import CustomUser
 from .forms import LoginForm
+from quiz.models import Assignment, Course, CourseDocument, CourseMembership
 
 
 def _can_view_teacher_dashboard(user):
@@ -61,6 +63,20 @@ def _dashboard_context(request, active_section, breadcrumb_parts):
     }
 
 
+def _student_course_ids(user):
+    if user.is_superuser:
+        return list(Course.objects.filter(is_active=True).values_list('id', flat=True))
+
+    return list(
+        CourseMembership.objects.filter(
+            user=user,
+            role=CourseMembership.MembershipRole.STUDENT,
+            is_active=True,
+            course__is_active=True,
+        ).values_list('course_id', flat=True)
+    )
+
+
 @login_required
 def logout_view(request):
     logout(request)
@@ -93,23 +109,70 @@ def student_dashboard_view(request):
 
 @login_required
 def dashboard_quizzes_view(request):
+    if not (_can_view_teacher_dashboard(request.user) or _can_view_student_dashboard(request.user)):
+        return redirect('home')
+
     context = _dashboard_context(
         request,
         active_section='quizzes',
         breadcrumb_parts=['English Course', 'Quizzes', 'Overview'],
     )
-    template = 'teacher_dashboard.html' if _can_view_teacher_dashboard(request.user) else 'student_dashboard.html'
+
+    if _can_view_teacher_dashboard(request.user) and not _can_view_student_dashboard(request.user):
+        return render(request, 'teacher_dashboard.html', context)
+
+    course_ids = _student_course_ids(request.user)
+    assignments = Assignment.objects.filter(
+        course_id__in=course_ids,
+        published=True,
+    ).select_related('course', 'quiz', 'document')
+    now = timezone.now()
+
+    context.update(
+        {
+            'course_count': len(course_ids),
+            'upcoming_assignments': assignments.filter(due_at__gte=now).order_by('due_at', 'title')[:8],
+            'undated_assignments': assignments.filter(due_at__isnull=True).order_by('title')[:8],
+            'recent_quiz_assignments': assignments.filter(
+                type=Assignment.AssignmentType.QUIZ,
+                quiz__isnull=False,
+            ).order_by('-created_at')[:8],
+        }
+    )
+    template = 'quiz/student_assignments.html'
     return render(request, template, context)
 
 
 @login_required
 def dashboard_documents_view(request):
+    if not (_can_view_teacher_dashboard(request.user) or _can_view_student_dashboard(request.user)):
+        return redirect('home')
+
     context = _dashboard_context(
         request,
         active_section='documents',
         breadcrumb_parts=['English Course', 'Documents', 'Library'],
     )
-    template = 'teacher_dashboard.html' if _can_view_teacher_dashboard(request.user) else 'student_dashboard.html'
+
+    if _can_view_teacher_dashboard(request.user) and not _can_view_student_dashboard(request.user):
+        return render(request, 'teacher_dashboard.html', context)
+
+    course_ids = _student_course_ids(request.user)
+    context.update(
+        {
+            'course_count': len(course_ids),
+            'folder_roots': CourseDocument.objects.filter(
+                course_id__in=course_ids,
+                kind=CourseDocument.DocumentKind.FOLDER,
+                parent__isnull=True,
+            ).select_related('course').prefetch_related('children')[:30],
+            'recent_resources': CourseDocument.objects.filter(
+                course_id__in=course_ids,
+                kind__in=[CourseDocument.DocumentKind.FILE, CourseDocument.DocumentKind.LINK],
+            ).select_related('course').order_by('-updated_at')[:12],
+        }
+    )
+    template = 'quiz/student_documents.html'
     return render(request, template, context)
 
 

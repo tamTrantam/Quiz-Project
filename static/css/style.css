@@ -235,7 +235,7 @@ body.has-top-nav .dashboard-layout {
 }
 
 .viewport-card {
-    background: #d1cfcf;
+    background: #ffffff;
     border: 1px solid #dde5ef;
     border-radius: 10px;
     padding: 18px;
@@ -246,6 +246,52 @@ body.has-top-nav .dashboard-layout {
     display: flex;
     gap: 10px;
     flex-wrap: wrap;
+}
+
+.student-workflow-grid {
+    display: grid;
+    gap: 16px;
+}
+
+.workflow-section {
+    border: 1px solid #cdd8e4;
+    background: #f8fbff;
+    border-radius: 8px;
+    padding: 12px;
+}
+
+.workflow-section h3 {
+    margin: 0 0 10px;
+    font-size: 1.05rem;
+}
+
+.workflow-list {
+    margin: 0;
+    padding-left: 18px;
+}
+
+.workflow-list li {
+    margin: 0 0 8px;
+}
+
+.workflow-meta {
+    display: block;
+    color: #4d6076;
+    font-size: 0.9rem;
+}
+
+.workflow-muted {
+    color: #4d6076;
+    margin-bottom: 8px;
+}
+
+.workflow-empty {
+    margin: 0;
+    color: #60758c;
+}
+
+.workflow-action-row {
+    margin-top: 12px;
 }
 
 .dashboard-layout.sidebar-collapsed {

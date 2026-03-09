@@ -1,0 +1,42 @@
+{% extends 'accounts/dashboard_shell.html' %}
+
+{% block title %}Student Documents{% endblock %}
+
+{% block dashboard_viewport %}
+<div class="viewport-card student-workflow-grid">
+    <h2>Document Library</h2>
+    <p class="workflow-muted">Browse documents from your {{ course_count }} enrolled course{{ course_count|pluralize }}.</p>
+
+    <section class="workflow-section">
+        <h3>Top-Level Folders</h3>
+        {% if folder_roots %}
+            <ul class="workflow-list">
+                {% for folder in folder_roots %}
+                    <li>
+                        <strong>{{ folder.title }}</strong>
+                        <span class="workflow-meta">{{ folder.course.title }} | {{ folder.children.count }} item{{ folder.children.count|pluralize }}</span>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="workflow-empty">No folders available yet.</p>
+        {% endif %}
+    </section>
+
+    <section class="workflow-section">
+        <h3>Recent Files and Links</h3>
+        {% if recent_resources %}
+            <ul class="workflow-list">
+                {% for document in recent_resources %}
+                    <li>
+                        <a href="{% url 'student_document_open' document.id %}" target="_blank" rel="noopener noreferrer">{{ document.title }}</a>
+                        <span class="workflow-meta">{{ document.course.title }} | {{ document.kind|title }}</span>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="workflow-empty">No resources published yet.</p>
+        {% endif %}
+    </section>
+</div>
+{% endblock %}

@@ -8,6 +8,18 @@ This plan follows the current project state and defines the next development pha
 - Completed local auth flows (login/logout/reset)
 - Partial Google auth wiring (provider and routes integrated)
 
+## Checkpoint (2026-03-09)
+- Student workflow views are implemented: assignment list/detail and document access from dashboard.
+- Student workflow tests pass under `manage.py test quiz`.
+- Question admin CRUD has been improved with a custom admin form for `payload` guidance and validation.
+- Admin now accepts MCQ `correct_answer` as option id (e.g. `"1"`) or option value (e.g. `"B"`), then normalizes to option value.
+
+### Resume from here
+1. Start `Phase 3: Teacher workflow views`.
+2. Build teacher course list and per-course student roster pages first.
+3. Add teacher-side placeholders for assignment/document creation in dashboard shell.
+4. Keep role/membership guards strict in all new teacher routes.
+
 ## Phase 1: Doc and Assignment models
 Goal: Introduce content and assignment entities that connect to courses.
 

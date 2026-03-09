@@ -1,0 +1,33 @@
+{% extends 'accounts/dashboard_shell.html' %}
+
+{% block title %}Assignment Detail{% endblock %}
+
+{% block dashboard_viewport %}
+<div class="viewport-card">
+    <h2>{{ assignment.title }}</h2>
+    <p class="workflow-meta">Course: {{ assignment.course.title }}</p>
+    <p class="workflow-meta">Type: {{ assignment.get_type_display }}</p>
+    {% if assignment.due_at %}
+        <p class="workflow-meta">Due: {{ assignment.due_at|date:'M d, Y H:i' }}</p>
+    {% else %}
+        <p class="workflow-meta">Due: No due date</p>
+    {% endif %}
+
+    {% if assignment.description %}
+        <hr>
+        <p>{{ assignment.description }}</p>
+    {% endif %}
+
+    {% if assignment.quiz %}
+        <div class="workflow-action-row">
+            <a class="btn btn-primary" href="#" aria-disabled="true">Start Quiz (next phase)</a>
+        </div>
+    {% endif %}
+
+    {% if assignment.document %}
+        <div class="workflow-action-row">
+            <a class="btn btn-outline-primary" href="{% url 'student_document_open' assignment.document.id %}" target="_blank" rel="noopener noreferrer">Open Assignment Resource</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
