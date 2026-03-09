@@ -176,3 +176,87 @@ class CourseMembership(models.Model):
 
     def __str__(self):
         return f"{self.user} - {self.role} in {self.course}"
+
+
+class CourseDocument(models.Model):
+    """Hierarchical course document node: folder, file, or external link."""
+
+    class DocumentKind(models.TextChoices):
+        FOLDER = 'folder', 'Folder'
+        FILE = 'file', 'File'
+        LINK = 'link', 'Link'
+
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='documents')
+    parent = models.ForeignKey(
+        'self',
+        on_delete=models.CASCADE,
+        related_name='children',
+        blank=True,
+        null=True,
+    )
+    title = models.CharField(max_length=200)
+    kind = models.CharField(max_length=20, choices=DocumentKind.choices, default=DocumentKind.FOLDER)
+    file = models.FileField(upload_to='course_documents/', blank=True, null=True)
+    external_url = models.URLField(blank=True, null=True)
+    description = models.TextField(blank=True)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['title']
+
+    def __str__(self):
+        return f"{self.course.title} - {self.title}"
+
+    def clean(self):
+        if self.kind == self.DocumentKind.FILE and not self.file:
+            raise ValidationError("File is required when document kind is 'file'.")
+
+        if self.kind == self.DocumentKind.LINK and not self.external_url:
+            raise ValidationError("External URL is required when document kind is 'link'.")
+
+        if self.kind == self.DocumentKind.FOLDER and (self.file or self.external_url):
+            raise ValidationError("Folder kind cannot have file or external URL.")
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
+
+
+class Assignment(models.Model):
+    """Course assignment that can point to a quiz or a document."""
+
+    class AssignmentType(models.TextChoices):
+        QUIZ = 'quiz', 'Quiz'
+        DOCUMENT = 'document', 'Document'
+        HOMEWORK = 'homework', 'Homework'
+
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='assignments')
+    title = models.CharField(max_length=200)
+    type = models.CharField(max_length=20, choices=AssignmentType.choices, default=AssignmentType.HOMEWORK)
+    quiz = models.ForeignKey(Quiz, on_delete=models.SET_NULL, blank=True, null=True, related_name='assignments')
+    document = models.ForeignKey(CourseDocument, on_delete=models.SET_NULL, blank=True, null=True, related_name='assignments')
+    due_at = models.DateTimeField(blank=True, null=True)
+    published = models.BooleanField(default=False)
+    description = models.TextField(blank=True)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.course.title} - {self.title}"
+
+    def clean(self):
+        if self.type == self.AssignmentType.QUIZ and not self.quiz:
+            raise ValidationError("Quiz is required when assignment type is 'quiz'.")
+
+        if self.type == self.AssignmentType.DOCUMENT and not self.document:
+            raise ValidationError("Document is required when assignment type is 'document'.")
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
