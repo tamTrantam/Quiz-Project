@@ -1,8 +1,10 @@
 # accounts/views.py
-from django.shortcuts import render, redirect
+from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.templatetags.static import static
+from django.urls import reverse
+from django.db.models import Count, Q
 from django.utils import timezone
 from .models import CustomUser
 from .forms import LoginForm
@@ -77,6 +79,20 @@ def _student_course_ids(user):
     )
 
 
+def _teacher_course_ids(user):
+    if user.is_superuser:
+        return list(Course.objects.filter(is_active=True).values_list('id', flat=True))
+
+    return list(
+        CourseMembership.objects.filter(
+            user=user,
+            role=CourseMembership.MembershipRole.TEACHER,
+            is_active=True,
+            course__is_active=True,
+        ).values_list('course_id', flat=True)
+    )
+
+
 @login_required
 def logout_view(request):
     logout(request)
@@ -119,7 +135,26 @@ def dashboard_quizzes_view(request):
     )
 
     if _can_view_teacher_dashboard(request.user) and not _can_view_student_dashboard(request.user):
-        return render(request, 'teacher_dashboard.html', context)
+        course_ids = _teacher_course_ids(request.user)
+        teacher_courses = Course.objects.filter(id__in=course_ids).annotate(
+            student_count=Count(
+                'memberships',
+                filter=Q(
+                    memberships__role=CourseMembership.MembershipRole.STUDENT,
+                    memberships__is_active=True,
+                ),
+                distinct=True,
+            ),
+            assignment_count=Count('assignments', distinct=True),
+            quiz_count=Count('quizzes', distinct=True),
+        )
+        context.update(
+            {
+                'course_count': len(course_ids),
+                'teacher_courses': teacher_courses,
+            }
+        )
+        return render(request, 'quiz/teacher_courses.html', context)
 
     course_ids = _student_course_ids(request.user)
     assignments = Assignment.objects.filter(
@@ -155,7 +190,22 @@ def dashboard_documents_view(request):
     )
 
     if _can_view_teacher_dashboard(request.user) and not _can_view_student_dashboard(request.user):
-        return render(request, 'teacher_dashboard.html', context)
+        course_ids = _teacher_course_ids(request.user)
+        teacher_courses = Course.objects.filter(id__in=course_ids).annotate(
+            document_count=Count('documents', distinct=True),
+            folder_count=Count(
+                'documents',
+                filter=Q(documents__kind=CourseDocument.DocumentKind.FOLDER),
+                distinct=True,
+            ),
+        )
+        context.update(
+            {
+                'course_count': len(course_ids),
+                'teacher_courses': teacher_courses,
+            }
+        )
+        return render(request, 'quiz/teacher_documents.html', context)
 
     course_ids = _student_course_ids(request.user)
     context.update(
@@ -185,3 +235,36 @@ def dashboard_settings_view(request):
     )
     template = 'teacher_dashboard.html' if _can_view_teacher_dashboard(request.user) else 'student_dashboard.html'
     return render(request, template, context)
+
+
+@login_required
+def dashboard_teacher_course_detail_view(request, course_id):
+    if not _can_view_teacher_dashboard(request.user):
+        return redirect('home')
+
+    teacher_course_ids = _teacher_course_ids(request.user)
+    course = get_object_or_404(Course, id=course_id, is_active=True, id__in=teacher_course_ids)
+
+    active_section = 'documents' if request.GET.get('section') == 'documents' else 'quizzes'
+    section_label = 'Documents' if active_section == 'documents' else 'Quizzes'
+
+    context = _dashboard_context(
+        request,
+        active_section=active_section,
+        breadcrumb_parts=['English Course', course.title, section_label, 'Teacher View'],
+    )
+    context.update(
+        {
+            'course': course,
+            'students': CourseMembership.objects.filter(
+                course=course,
+                role=CourseMembership.MembershipRole.STUDENT,
+                is_active=True,
+            ).select_related('user').order_by('user__username'),
+            'assignments': Assignment.objects.filter(course=course).select_related('quiz', 'document')[:20],
+            'documents': CourseDocument.objects.filter(course=course, parent__isnull=True).order_by('title')[:20],
+            'admin_assignment_add_url': reverse('admin:quiz_assignment_add'),
+            'admin_document_add_url': reverse('admin:quiz_coursedocument_add'),
+        }
+    )
+    return render(request, 'quiz/teacher_course_detail.html', context)

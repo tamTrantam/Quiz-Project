@@ -1,0 +1,26 @@
+{% extends 'accounts/dashboard_shell.html' %}
+
+{% block title %}Teacher Documents{% endblock %}
+
+{% block dashboard_viewport %}
+<div class="viewport-card student-workflow-grid">
+    <h2>Teaching Courses - Documents</h2>
+    <p class="workflow-muted">You manage {{ course_count }} active course{{ course_count|pluralize }}.</p>
+
+    <section class="workflow-section">
+        <h3>Document Library Overview</h3>
+        {% if teacher_courses %}
+            <ul class="workflow-list">
+                {% for course in teacher_courses %}
+                    <li>
+                        <a href="{% url 'dashboard_teacher_course_detail' course.id %}?section=documents">{{ course.title }}</a>
+                        <span class="workflow-meta">{{ course.document_count }} document{{ course.document_count|pluralize }} | {{ course.folder_count }} folder{{ course.folder_count|pluralize }}</span>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="workflow-empty">No assigned teaching courses yet.</p>
+        {% endif %}
+    </section>
+</div>
+{% endblock %}

@@ -1,0 +1,66 @@
+{% extends 'accounts/dashboard_shell.html' %}
+
+{% block title %}Teacher Course Detail{% endblock %}
+
+{% block dashboard_viewport %}
+<div class="viewport-card student-workflow-grid">
+    <h2>{{ course.title }}</h2>
+    <p class="workflow-muted">Teacher course workspace with roster and content summary.</p>
+
+    <section class="workflow-section">
+        <h3>Course Actions (Admin-First)</h3>
+        <div class="workflow-action-row">
+            <a class="btn btn-outline-primary" href="{{ admin_assignment_add_url }}" target="_blank" rel="noopener noreferrer">Create Assignment in Admin</a>
+            <a class="btn btn-outline-primary" href="{{ admin_document_add_url }}" target="_blank" rel="noopener noreferrer">Create Document in Admin</a>
+        </div>
+    </section>
+
+    <section class="workflow-section">
+        <h3>Enrolled Students</h3>
+        {% if students %}
+            <ul class="workflow-list">
+                {% for membership in students %}
+                    <li>
+                        <strong>{{ membership.user.get_full_name|default:membership.user.username }}</strong>
+                        <span class="workflow-meta">{{ membership.user.email|default:'No email set' }}</span>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="workflow-empty">No active student memberships in this course.</p>
+        {% endif %}
+    </section>
+
+    <section class="workflow-section">
+        <h3>Recent Assignments</h3>
+        {% if assignments %}
+            <ul class="workflow-list">
+                {% for assignment in assignments %}
+                    <li>
+                        <strong>{{ assignment.title }}</strong>
+                        <span class="workflow-meta">{{ assignment.get_type_display }} | {% if assignment.published %}Published{% else %}Draft{% endif %}</span>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="workflow-empty">No assignments created yet.</p>
+        {% endif %}
+    </section>
+
+    <section class="workflow-section">
+        <h3>Top-Level Documents</h3>
+        {% if documents %}
+            <ul class="workflow-list">
+                {% for document in documents %}
+                    <li>
+                        <strong>{{ document.title }}</strong>
+                        <span class="workflow-meta">{{ document.get_kind_display }}</span>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="workflow-empty">No top-level documents yet.</p>
+        {% endif %}
+    </section>
+</div>
+{% endblock %}

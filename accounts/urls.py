@@ -41,5 +41,6 @@ urlpatterns = [
     path('dashboard/student/', views.student_dashboard_view, name='student_dashboard'),
     path('dashboard/quizzes/', views.dashboard_quizzes_view, name='dashboard_quizzes'),
     path('dashboard/documents/', views.dashboard_documents_view, name='dashboard_documents'),
+    path('dashboard/teacher/courses/<int:course_id>/', views.dashboard_teacher_course_detail_view, name='dashboard_teacher_course_detail'),
     path('dashboard/settings/', views.dashboard_settings_view, name='dashboard_settings'),
 ]
